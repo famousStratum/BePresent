@@ -1,5 +1,9 @@
 # Be Present
 
+![Android Min API](https://img.shields.io/badge/API-24%2B-brightgreen.svg)
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![App Size](https://img.shields.io/badge/App_Size-1_MB-blue.svg)
+
 Be Present is a simple Android application designed to help you stay present throughout your day. It sends gentle reminders at intervals within a custom time window, encouraging moments of mindfulness.
 
 ## Features
