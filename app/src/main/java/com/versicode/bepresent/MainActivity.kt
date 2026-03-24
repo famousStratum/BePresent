@@ -1,4 +1,4 @@
-package com.example.mindfulnessreminder
+package com.versicode.bepresent
 
 import android.app.TimePickerDialog
 import android.os.Bundle
@@ -15,12 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -38,12 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mindfulnessreminder.notifications.NotificationHelper
-import com.example.mindfulnessreminder.notifications.NotificationScheduler
-import com.example.mindfulnessreminder.ui.theme.MindfulnessReminderTheme
-import java.util.Locale
+import com.versicode.bepresent.notifications.NotificationHelper
+import com.versicode.bepresent.notifications.NotificationScheduler
+import com.versicode.bepresent.ui.theme.BePresentTheme
 import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
@@ -60,9 +56,9 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            MindfulnessReminderTheme {
+            BePresentTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MindfulnessReminderScreen(
+                    BePresentScreen(
                         modifier = Modifier.padding(innerPadding),
                         onScheduleManual = { count, startH, startM, endH, endM ->
                             notificationScheduler.scheduleManualConfigurator(count, startH, startM, endH, endM)
@@ -85,7 +81,7 @@ enum class ReminderMode {
 }
 
 @Composable
-fun MindfulnessReminderScreen(
+fun BePresentScreen(
     modifier: Modifier = Modifier,
     onScheduleManual: (Int, Int, Int, Int, Int) -> Unit,
     onScheduleRandom: (Int, Int, Int, Int) -> Unit,
@@ -118,38 +114,19 @@ fun MindfulnessReminderScreen(
     if (showInfoDialog) {
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
-            title = { Text("About Mindfulness Reminder") },
+            title = { Text(stringResource(R.string.about_title)) },
             text = {
-                Text(
-                    "This app helps you stay present by sending reminders at random intervals throughout the day within your chosen window.\n\n" +
-                            "• Enable Reminders: Turn the service on or off.\n" +
-                            "• Notification Window: Define when you want to receive reminders.\n" +
-                            "• Random Mode: The app picks a random number of notifications (1-10) each day.\n" +
-                            "• Manual Mode: You choose exactly how many notifications you want per day."
-                )
+                Text(stringResource(R.string.about_text))
             },
             confirmButton = {
                 TextButton(onClick = { showInfoDialog = false }) {
-                    Text("Got it")
+                    Text(stringResource(R.string.got_it))
                 }
             }
         )
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        IconButton(
-            onClick = { showInfoDialog = true },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Info,
-                contentDescription = "About",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -162,7 +139,7 @@ fun MindfulnessReminderScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Enable Reminders", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.enable_reminders), style = MaterialTheme.typography.titleLarge)
                 Switch(
                     checked = isEnabled,
                     onCheckedChange = { isEnabled = it }
@@ -172,7 +149,7 @@ fun MindfulnessReminderScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             if (isEnabled) {
-                Text("Notification Window", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.notification_window), style = MaterialTheme.typography.titleMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -181,19 +158,19 @@ fun MindfulnessReminderScreen(
                     Button(onClick = {
                         TimePickerDialog(context, { _, h, m -> startHour = h; startMinute = m }, startHour, startMinute, true).show()
                     }) {
-                        Text(String.format(Locale.getDefault(), "Start: %02d:%02d", startHour, startMinute))
+                        Text(stringResource(R.string.time_format_start, startHour, startMinute))
                     }
-                    Text("to")
+                    Text(stringResource(R.string.to))
                     Button(onClick = {
                         TimePickerDialog(context, { _, h, m -> endHour = h; endMinute = m }, endHour, endMinute, true).show()
                     }) {
-                        Text(String.format(Locale.getDefault(), "End: %02d:%02d", endHour, endMinute))
+                        Text(stringResource(R.string.time_format_end, endHour, endMinute))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Text("Reminder Type", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.reminder_type), style = MaterialTheme.typography.titleMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -202,20 +179,20 @@ fun MindfulnessReminderScreen(
                         selected = reminderMode == ReminderMode.RANDOM,
                         onClick = { reminderMode = ReminderMode.RANDOM }
                     )
-                    Text("Random", modifier = Modifier.padding(start = 8.dp))
+                    Text(stringResource(R.string.reminder_type_random), modifier = Modifier.padding(start = 8.dp))
                     Spacer(modifier = Modifier.width(24.dp))
                     RadioButton(
                         selected = reminderMode == ReminderMode.MANUAL,
                         onClick = { reminderMode = ReminderMode.MANUAL }
                     )
-                    Text("Manual", modifier = Modifier.padding(start = 8.dp))
+                    Text(stringResource(R.string.reminder_type_manual), modifier = Modifier.padding(start = 8.dp))
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 if (reminderMode == ReminderMode.MANUAL) {
                     Text(
-                        "Notifications per day: ${sliderValue.roundToInt()}",
+                        stringResource(R.string.notifications_per_day, sliderValue.roundToInt()),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Slider(
@@ -227,7 +204,7 @@ fun MindfulnessReminderScreen(
                 }
             } else {
                 Text(
-                    "Reminders are currently disabled.",
+                    stringResource(R.string.reminders_disabled),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -238,8 +215,8 @@ fun MindfulnessReminderScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MindfulnessReminderScreenPreview() {
-    MindfulnessReminderTheme {
-        MindfulnessReminderScreen(onScheduleManual = {_,_,_,_,_ ->}, onScheduleRandom = {_,_,_,_ ->}, onCancel = {})
+fun BePresentScreenPreview() {
+    BePresentTheme {
+        BePresentScreen(onScheduleManual = {_,_,_,_,_ ->}, onScheduleRandom = {_,_,_,_ ->}, onCancel = {})
     }
 }

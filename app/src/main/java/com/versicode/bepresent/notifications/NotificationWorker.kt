@@ -1,4 +1,4 @@
-package com.example.mindfulnessreminder.notifications
+package com.versicode.bepresent.notifications
 
 import android.content.Context
 import androidx.work.CoroutineWorker

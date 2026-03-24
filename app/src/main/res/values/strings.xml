@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">Mindfulness Reminder</string>
+    <string name="app_name">Be Present</string>
+    <string name="about_title">About Be Present</string>
+    <string name="about_text">This app helps you stay present by sending reminders at random intervals throughout the day within your chosen window.\n\n• Enable Reminders: Turn the service on or off.\n• Notification Window: Define when you want to receive reminders.\n• Random Mode: The app picks a random number of notifications (1–10) each day.\n• Manual Mode: You choose exactly how many notifications you want per day.</string>
+    <string name="got_it">Got it</string>
+    <string name="enable_reminders">Enable Reminders</string>
+    <string name="notification_window">Notification Window</string>
+    <string name="to">to</string>
+    <string name="reminder_type">Reminder Type</string>
+    <string name="reminder_type_random">Random</string>
+    <string name="reminder_type_manual">Manual</string>
+    <string name="notifications_per_day">Notifications per day: %1$d</string>
+    <string name="reminders_disabled">Reminders are currently disabled.</string>
+    <string name="time_format_start">Start: %1$02d:%2$02d</string>
+    <string name="time_format_end">End: %1$02d:%2$02d</string>
+    <string name="about_content_description">About</string>
+
+    <!-- Notification Strings -->
+    <string name="notification_channel_name">Be Present</string>
+    <string name="notification_channel_description">Channel for Be Present</string>
+    <string name="notification_title">Be Present</string>
+    <string name="notification_text">Time for a mindful moment.</string>
 </resources>

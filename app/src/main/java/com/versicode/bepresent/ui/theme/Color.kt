@@ -1,4 +1,4 @@
-package com.example.mindfulnessreminder.ui.theme
+package com.versicode.bepresent.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

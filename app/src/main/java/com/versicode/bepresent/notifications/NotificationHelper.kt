@@ -1,4 +1,4 @@
-package com.example.mindfulnessreminder.notifications
+package com.versicode.bepresent.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,16 +8,16 @@ import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.example.mindfulnessreminder.R
+import androidx.core.net.toUri
+import com.versicode.bepresent.R
 
 class NotificationHelper(private val context: Context) {
 
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    private val soundUri: Uri = Uri.parse(
-        ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + R.raw.bowl
-    )
+    private val soundUri: Uri =
+        (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + R.raw.bowl).toUri()
 
     fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -31,10 +31,10 @@ class NotificationHelper(private val context: Context) {
 
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Mindfulness Reminders",
+                context.getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Channel for mindfulness reminders"
+                description = context.getString(R.string.notification_channel_description)
                 setSound(soundUri, audioAttributes)
             }
             notificationManager.createNotificationChannel(channel)
@@ -43,17 +43,18 @@ class NotificationHelper(private val context: Context) {
 
     fun sendNotification() {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Mindfulness Reminder")
-            .setContentText("Time for a mindful moment.")
+            .setSmallIcon(R.drawable.notification)
+            .setContentTitle(context.getString(R.string.notification_title))
+            .setContentText(context.getString(R.string.notification_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSound(soundUri)
+            .setAutoCancel(true)
 
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
     companion object {
-        const val CHANNEL_ID = "mindfulness_reminder_channel"
+        const val CHANNEL_ID = "be_present_channel"
         const val NOTIFICATION_ID = 1
     }
 }
