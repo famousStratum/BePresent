@@ -1,16 +1,41 @@
+gitignore
+# IntelliJ / Android Studio
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/
 .DS_Store
-/build
+*.bundle
+
+# Build artifacts
+build/
+/*/build
 /captures
 .externalNativeBuild
 .cxx
+
+# Release artifacts
+/app/release/
+*.apk
+output-metadata.json
+
+# Signing files
+*.jks
+*.keystore
+*.p12
+google-services.json
+
+# Local configuration
 local.properties
-/app/release
+
+# Kotlin specific
+.kotlin/
+
+# OS specific
+Thumbs.db
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
