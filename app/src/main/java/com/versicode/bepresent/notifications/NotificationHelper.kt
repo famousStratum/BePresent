@@ -17,7 +17,7 @@ class NotificationHelper(private val context: Context) {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     private val soundUri: Uri =
-        (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + R.raw.bowl).toUri()
+        (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + R.raw.bee_present).toUri()
 
     fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -41,7 +41,7 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    fun sendNotification() {
+    fun sendNotification(notificationId: Int) {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.notification)
             .setContentTitle(context.getString(R.string.notification_title))
@@ -50,11 +50,10 @@ class NotificationHelper(private val context: Context) {
             .setSound(soundUri)
             .setAutoCancel(true)
 
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 
     companion object {
         const val CHANNEL_ID = "be_present_channel"
-        const val NOTIFICATION_ID = 1
     }
 }

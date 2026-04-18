@@ -17,7 +17,7 @@ class DailyConfiguratorWorker(
         val endMinute = inputData.getInt("endMinute", 0)
 
         val scheduler = NotificationScheduler(applicationContext)
-        val count = Random.nextInt(1, 11)
+        val count = Random.nextInt(1, 10)
         
         scheduler.scheduleRandomNotificationsForToday(count, startHour, startMinute, endHour, endMinute)
         

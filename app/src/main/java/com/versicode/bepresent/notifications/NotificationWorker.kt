@@ -10,8 +10,9 @@ class NotificationWorker(
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
+        val notificationId = inputData.getInt("notificationId", 1)
         val notificationHelper = NotificationHelper(applicationContext)
-        notificationHelper.sendNotification()
+        notificationHelper.sendNotification(notificationId)
         return Result.success()
     }
 }
