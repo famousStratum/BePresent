@@ -1,10 +1,12 @@
 package com.versicode.bepresent
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.TimePickerDialog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.media.MediaPlayer
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,8 +30,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.versicode.bepresent.notifications.NotificationHelper
 import com.versicode.bepresent.notifications.NotificationScheduler
+import com.versicode.bepresent.notifications.NotificationSound
 import com.versicode.bepresent.ui.theme.BePresentTheme
 import kotlin.math.roundToInt
 
@@ -58,7 +63,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         notificationHelper = NotificationHelper(this)
-        notificationHelper.createNotificationChannel()
         notificationScheduler = NotificationScheduler(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -75,6 +79,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     BePresentScreen(
                         modifier = Modifier.padding(innerPadding),
+                        onSoundSelected = { sound ->
+                            notificationHelper.createNotificationChannel(sound)
+                        },
                         onScheduleManual = { count, startH, startM, endH, endM ->
                             notificationScheduler.scheduleManualConfigurator(count, startH, startM, endH, endM)
                         },
@@ -104,20 +111,38 @@ fun intensityLabel(count: Int): Int = when (count) {
 @Composable
 fun BePresentScreen(
     modifier: Modifier = Modifier,
+    onSoundSelected: (NotificationSound) -> Unit,
     onScheduleManual: (Int, Int, Int, Int, Int) -> Unit,
     onScheduleRandom: (Int, Int, Int, Int) -> Unit,
     onCancel: () -> Unit
 ) {
     var isActive by remember { mutableStateOf(false) }
+    var notificationSound by remember { mutableStateOf(NotificationSound.A_SHARP_BOWL) }
     var reminderMode by remember { mutableStateOf(ReminderMode.RANDOM) }
     var sliderValue by remember { mutableFloatStateOf(1f) }
 
-    var startHour by remember { mutableStateOf(9) }
-    var startMinute by remember { mutableStateOf(0) }
-    var endHour by remember { mutableStateOf(21) }
-    var endMinute by remember { mutableStateOf(0) }
+    var startHour by remember { mutableIntStateOf(9) }
+    var startMinute by remember { mutableIntStateOf(0) }
+    var endHour by remember { mutableIntStateOf(21) }
+    var endMinute by remember { mutableIntStateOf(0) }
 
     val context = LocalContext.current
+
+    val mediaPlayer = remember { runCatching { MediaPlayer() }.getOrNull() }
+    DisposableEffect(Unit) {
+        onDispose { mediaPlayer?.release() }
+    }
+
+    // Accessing resources via the context directly here is the correct way for MediaPlayer
+    @SuppressLint("LocalContextResourcesRead")
+    fun playPreview(sound: NotificationSound) {
+        mediaPlayer?.reset()
+        val afd = context.resources.openRawResourceFd(sound.toRawResId())
+        mediaPlayer?.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+        afd.close()
+        mediaPlayer?.prepare()
+        mediaPlayer?.start()
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -171,6 +196,29 @@ fun BePresentScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    Text(stringResource(R.string.notification_sound), style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    listOf(
+                        NotificationSound.A_SHARP_BOWL to stringResource(R.string.a_sharp_bowl),
+                        NotificationSound.D_SHARP_BOWL to stringResource(R.string.d_sharp_bowl),
+                        NotificationSound.BEE_PRESENT to stringResource(R.string.bee_present)
+                    ).forEach { (sound, label) ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = notificationSound == sound,
+                                onClick = {
+                                    notificationSound = sound
+                                    playPreview(sound)
+                                }
+                            )
+                            Text(label, modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
                     Text(stringResource(R.string.reminder_type), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -222,6 +270,7 @@ fun BePresentScreen(
             } else {
                 Button(
                     onClick = {
+                        onSoundSelected(notificationSound)
                         when (reminderMode) {
                             ReminderMode.RANDOM -> onScheduleRandom(startHour, startMinute, endHour, endMinute)
                             ReminderMode.MANUAL -> onScheduleManual(sliderValue.roundToInt(), startHour, startMinute, endHour, endMinute)
@@ -243,6 +292,6 @@ fun BePresentScreen(
 @Composable
 fun BePresentScreenPreview() {
     BePresentTheme {
-        BePresentScreen(onScheduleManual = { _, _, _, _, _ -> }, onScheduleRandom = { _, _, _ ,_ -> }, onCancel = {})
+        BePresentScreen(onScheduleManual = { _, _, _, _, _ -> }, onScheduleRandom = { _, _, _ ,_ -> }, onSoundSelected = { _ -> }, onCancel = {})
     }
 }

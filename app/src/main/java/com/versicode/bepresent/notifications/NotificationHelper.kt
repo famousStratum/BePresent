@@ -16,12 +16,11 @@ class NotificationHelper(private val context: Context) {
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    private val soundUri: Uri =
-        (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + R.raw.bee_present).toUri()
+    private fun soundUri(sound: NotificationSound): Uri =
+        (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.packageName + "/" + sound.toRawResId()).toUri()
 
-    fun createNotificationChannel() {
+    fun createNotificationChannel(sound: NotificationSound) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Delete the channel if it exists to update the sound
             notificationManager.deleteNotificationChannel(CHANNEL_ID)
 
             val audioAttributes = AudioAttributes.Builder()
@@ -35,7 +34,7 @@ class NotificationHelper(private val context: Context) {
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = context.getString(R.string.notification_channel_description)
-                setSound(soundUri, audioAttributes)
+                setSound(soundUri(sound), audioAttributes)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -47,7 +46,6 @@ class NotificationHelper(private val context: Context) {
             .setContentTitle(context.getString(R.string.notification_title))
             .setContentText(context.getString(R.string.notification_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(soundUri)
             .setAutoCancel(true)
 
         notificationManager.notify(notificationId, builder.build())

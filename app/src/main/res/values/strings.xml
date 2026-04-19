@@ -1,33 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">Be Present</string>
+    <string name="app_name" translatable="false">Be Present</string>
 
-<!-- About Section -->
-<string name="about_title">About Be Present</string>
-<string name="about_text">This app helps you stay present by sending reminders at random intervals throughout the day within your chosen window.\n\n• Enable Reminders: Turn the service on or off.\n• Notification Window: Define when you want to receive reminders.\n• Random Mode: The app picks a random number of notifications (1–10) each day.\n• Manual Mode: You choose exactly how many notifications you want per day.</string>
-<string name="got_it">Got it</string>
+    <!-- About Section -->
+    <string name="about_title">About Be Present</string>
+    <string name="about_text">This app helps you stay present by sending reminders at random intervals throughout the day within your chosen window.\n\n\u2022 Enable Reminders: Turn the service on or off.\n\u2022 Notification Window: Define when you want to receive reminders.\n\u2022 Random Mode: The app picks a random number of notifications (1–10) each day.\n\u2022 Manual Mode: You choose exactly how many notifications you want per day.</string>
+    <string name="got_it">Got it</string>
 
-<!-- Active / Inactive screen -->
-<string name="be_present">Be Present</string>
-<string name="step_away">Step Away</string>
-<string name="active_message">You are present.\n\nTake a deep breath, smile and get on with your day.</string>
+    <!-- Active / Inactive screen -->
+    <string name="be_present">Be Present</string>
+    <string name="step_away">Step Away</string>
+    <string name="active_message">Take a deep breath, smile and get on with your day.\n\nWe\'ll remind you to stay present.</string>
 
-<!-- Settings -->
-<string name="notification_window">Notification Window</string>
-<string name="to">to</string>
-<string name="reminder_type">Reminder Type</string>
-<string name="reminder_type_random">Random</string>
-<string name="reminder_type_manual">Manual</string>
-<string name="notifications_per_day">Notifications per day: %1$d</string>
-<string name="intensity_label">Intensity: %1$s</string>
-<string name="intensity_quiet">Insistently Quiet</string>
-<string name="intensity_normal">Normal</string>
-<string name="intensity_insistent">Quite Insistent</string>
-<string name="time_format_start">Start: %1$02d:%2$02d</string>
-<string name="time_format_end">End: %1$02d:%2$02d</string>
+    <!-- Settings -->
+    <string name="notification_window">Notification Window</string>
+    <string name="to">to</string>
+    <string name="reminder_type">Reminder Type</string>
+    <string name="reminder_type_random">Random</string>
+    <string name="reminder_type_manual">Manual</string>
+    <string name="intensity_label">Notification Intensity: %1$s</string>
+    <string name="intensity_quiet">Insistently Quiet</string>
+    <string name="intensity_normal">Normal</string>
+    <string name="intensity_insistent">Quite Insistent</string>
+    <string name="time_format_start">Start: %1$02d:%2$02d</string>
+    <string name="time_format_end">End: %1$02d:%2$02d</string>
+    <string name="notification_sound">Notification Sound</string>
+    <string name="a_sharp_bowl">A# Bowl</string>
+    <string name="d_sharp_bowl">D# Bowl</string>
+    <string name="bee_present">Bee Present</string>
 
-<!-- Notification -->
-<string name="notification_channel_name">Be Present</string>
-<string name="notification_channel_description">Channel for Be Present</string>
-<string name="notification_title">Be Present</string>
-<string name="notification_text">Time for a mindful moment.</string>
+    <!-- Notification -->
+    <string name="notification_channel_name">Be Present</string>
+    <string name="notification_channel_description">Channel for Be Present</string>
+    <string name="notification_title">Be Present</string>
+    <string name="notification_text">Time for a mindful moment.</string>
 </resources>
