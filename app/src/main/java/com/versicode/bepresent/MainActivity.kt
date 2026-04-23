@@ -89,7 +89,7 @@ class MainActivity : ComponentActivity() {
                         initialEndHour = prefs.getInt("endHour", 21),
                         initialEndMinute = prefs.getInt("endMinute", 0),
                         initialReminderMode = ReminderMode.valueOf(prefs.getString("reminderMode", ReminderMode.RANDOM.name)!!),
-                        initialSliderValue = prefs.getFloat("sliderValue", 1f),
+                        initialSliderValue = prefs.getInt("tier", 1).toFloat(),
                         initialNotificationSound = NotificationSound.valueOf(prefs.getString("notificationSound", NotificationSound.A_SHARP_BOWL.name)!!),
                         onSoundSelected = { sound ->
                             notificationHelper.createNotificationChannel(sound)
@@ -117,9 +117,9 @@ enum class ReminderMode {
     RANDOM, MANUAL
 }
 
-fun intensityLabel(count: Int): Int = when (count) {
-    in 1..3 -> R.string.intensity_quiet
-    in 4..6 -> R.string.intensity_normal
+fun intensityLabel(tier: Int): Int = when (tier) {
+    1 -> R.string.intensity_quiet
+    2 -> R.string.intensity_normal
     else -> R.string.intensity_insistent
 }
 
@@ -280,10 +280,10 @@ fun BePresentScreen(
                         Slider(
                             value = sliderValue,
                             onValueChange = { sliderValue = it
-                                prefs.edit { putFloat("sliderValue", it) }
+                                prefs.edit { putInt("tier", it.roundToInt()) }
                             },
-                            valueRange = 1f..9f,
-                            steps = 0
+                            valueRange = 1f..3f,
+                            steps = 1
                         )
                     }
                 }
