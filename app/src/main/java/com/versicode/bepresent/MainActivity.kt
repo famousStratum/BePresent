@@ -3,6 +3,7 @@ package com.versicode.bepresent
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -49,6 +50,7 @@ import com.versicode.bepresent.notifications.NotificationScheduler
 import com.versicode.bepresent.notifications.NotificationSound
 import com.versicode.bepresent.ui.theme.BePresentTheme
 import kotlin.math.roundToInt
+import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
 
@@ -73,24 +75,37 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+
         enableEdgeToEdge()
         setContent {
             BePresentTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     BePresentScreen(
                         modifier = Modifier.padding(innerPadding),
+                        initialIsActive = prefs.getBoolean("isActive", false),
+                        initialStartHour = prefs.getInt("startHour", 9),
+                        initialStartMinute = prefs.getInt("startMinute", 0),
+                        initialEndHour = prefs.getInt("endHour", 21),
+                        initialEndMinute = prefs.getInt("endMinute", 0),
+                        initialReminderMode = ReminderMode.valueOf(prefs.getString("reminderMode", ReminderMode.RANDOM.name)!!),
+                        initialSliderValue = prefs.getFloat("sliderValue", 1f),
+                        initialNotificationSound = NotificationSound.valueOf(prefs.getString("notificationSound", NotificationSound.A_SHARP_BOWL.name)!!),
                         onSoundSelected = { sound ->
                             notificationHelper.createNotificationChannel(sound)
                         },
                         onScheduleManual = { count, startH, startM, endH, endM ->
+                            prefs.edit { putBoolean("isActive", true) }
                             notificationScheduler.scheduleManualConfigurator(count, startH, startM, endH, endM)
                         },
                         onScheduleRandom = { startH, startM, endH, endM ->
+                            prefs.edit { putBoolean("isActive", true) }
                             notificationScheduler.scheduleDailyConfigurator(startH, startM, endH, endM)
                         },
                         onCancel = {
+                            prefs.edit { putBoolean("isActive", false) }
                             notificationScheduler.cancelAllReminders()
-                        }
+                        },
                     )
                 }
             }
@@ -111,22 +126,30 @@ fun intensityLabel(count: Int): Int = when (count) {
 @Composable
 fun BePresentScreen(
     modifier: Modifier = Modifier,
+    initialIsActive: Boolean = false,
+    initialStartHour: Int = 9,
+    initialStartMinute: Int = 0,
+    initialEndHour: Int = 21,
+    initialEndMinute: Int = 0,
+    initialReminderMode: ReminderMode = ReminderMode.RANDOM,
+    initialSliderValue: Float = 1f,
+    initialNotificationSound: NotificationSound = NotificationSound.A_SHARP_BOWL,
     onSoundSelected: (NotificationSound) -> Unit,
     onScheduleManual: (Int, Int, Int, Int, Int) -> Unit,
     onScheduleRandom: (Int, Int, Int, Int) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
 ) {
-    var isActive by remember { mutableStateOf(false) }
-    var notificationSound by remember { mutableStateOf(NotificationSound.A_SHARP_BOWL) }
-    var reminderMode by remember { mutableStateOf(ReminderMode.RANDOM) }
-    var sliderValue by remember { mutableFloatStateOf(1f) }
-
-    var startHour by remember { mutableIntStateOf(9) }
-    var startMinute by remember { mutableIntStateOf(0) }
-    var endHour by remember { mutableIntStateOf(21) }
-    var endMinute by remember { mutableIntStateOf(0) }
+    var isActive by remember { mutableStateOf(initialIsActive) }
+    var notificationSound by remember { mutableStateOf(initialNotificationSound) }
+    var reminderMode by remember { mutableStateOf(initialReminderMode) }
+    var sliderValue by remember { mutableFloatStateOf(initialSliderValue) }
+    var startHour by remember { mutableIntStateOf(initialStartHour) }
+    var startMinute by remember { mutableIntStateOf(initialStartMinute) }
+    var endHour by remember { mutableIntStateOf(initialEndHour) }
+    var endMinute by remember { mutableIntStateOf(initialEndMinute) }
 
     val context = LocalContext.current
+    val prefs = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
 
     val mediaPlayer = remember { runCatching { MediaPlayer() }.getOrNull() }
     DisposableEffect(Unit) {
@@ -182,14 +205,18 @@ fun BePresentScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(onClick = {
-                            TimePickerDialog(context, { _, h, m -> startHour = h; startMinute = m }, startHour, startMinute, true).show()
-                        }) {
+                            TimePickerDialog(context, { _, h, m ->
+                                startHour = h; startMinute = m
+                                prefs.edit { putInt("startHour", h).putInt("startMinute", m) }
+                            }, startHour, startMinute, true).show()                     }) {
                             Text(stringResource(R.string.time_format_start, startHour, startMinute))
                         }
                         Text(stringResource(R.string.to))
                         Button(onClick = {
-                            TimePickerDialog(context, { _, h, m -> endHour = h; endMinute = m }, endHour, endMinute, true).show()
-                        }) {
+                            TimePickerDialog(context, { _, h, m ->
+                                endHour = h; endMinute = m
+                                prefs.edit { putInt("endHour", h).putInt("endMinute", m) }
+                            }, endHour, endMinute, true).show()                    }) {
                             Text(stringResource(R.string.time_format_end, endHour, endMinute))
                         }
                     }
@@ -212,6 +239,7 @@ fun BePresentScreen(
                                 onClick = {
                                     notificationSound = sound
                                     playPreview(sound)
+                                    prefs.edit { putString("notificationSound", sound.name) }
                                 }
                             )
                             Text(label, modifier = Modifier.padding(start = 8.dp))
@@ -227,13 +255,18 @@ fun BePresentScreen(
                     ) {
                         RadioButton(
                             selected = reminderMode == ReminderMode.RANDOM,
-                            onClick = { reminderMode = ReminderMode.RANDOM }
+                            onClick = {
+                                reminderMode = ReminderMode.RANDOM
+                                prefs.edit { putString("reminderMode", ReminderMode.RANDOM.name) }                            }
                         )
                         Text(stringResource(R.string.reminder_type_random), modifier = Modifier.padding(start = 8.dp))
                         Spacer(modifier = Modifier.width(24.dp))
                         RadioButton(
                             selected = reminderMode == ReminderMode.MANUAL,
-                            onClick = { reminderMode = ReminderMode.MANUAL }
+                            onClick = {
+                                reminderMode = ReminderMode.MANUAL
+                                prefs.edit { putString("reminderMode", ReminderMode.MANUAL.name) }
+                            }
                         )
                         Text(stringResource(R.string.reminder_type_manual), modifier = Modifier.padding(start = 8.dp))
                     }
@@ -246,7 +279,9 @@ fun BePresentScreen(
                         )
                         Slider(
                             value = sliderValue,
-                            onValueChange = { sliderValue = it },
+                            onValueChange = { sliderValue = it
+                                prefs.edit { putFloat("sliderValue", it) }
+                            },
                             valueRange = 1f..9f,
                             steps = 0
                         )
@@ -292,6 +327,6 @@ fun BePresentScreen(
 @Composable
 fun BePresentScreenPreview() {
     BePresentTheme {
-        BePresentScreen(onScheduleManual = { _, _, _, _, _ -> }, onScheduleRandom = { _, _, _ ,_ -> }, onSoundSelected = { _ -> }, onCancel = {})
+        BePresentScreen(initialIsActive = false, onScheduleManual = { _, _, _, _, _ -> }, onScheduleRandom = { _, _, _ ,_ -> }, onSoundSelected = { _ -> }, onCancel = {})
     }
 }
